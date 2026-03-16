@@ -1,70 +1,78 @@
 # reading-notes-auth-practice
 
-`reading-notes-auth-practice` は、Rails で認証まわりの実装を切り出して練習するための個人用サンドボックスです。
+認証まわりの実装を、自力で説明・再現できる状態に近づけるための Rails 練習用リポジトリです。
 
-本番のポートフォリオ本体にいきなり認証実装を入れる前に、以下を小さく分けて検証することを目的にしています。
+## 概要
 
-- `SessionsController#create` の流れ
-- `has_secure_password` を使った認証
-- token 発行
-- token digest の保存
-- `AccessToken` モデル設計
-- `expires_at` / `revoked_at` の扱い
-- Rails の request / response / render の理解
-- API としてのレスポンス設計
+このリポジトリは、ポートフォリオ開発で扱った認証機能まわりを、できるだけ小さく切り出して練習するためのものです。
 
-## このリポジトリの位置づけ
+主な目的は以下です。
 
-これは**本番ポートフォリオではありません**。  
-認証実装を理解するための**練習用リポジトリ**です。
+- Rails における認証の基本的な流れを理解する
+- `SessionsController#create` のような処理を、自力で書いて説明できるようにする
+- `User` / `AccessToken` / migration / response の役割分担を整理する
+- AI による補助に頼りすぎず、公式ドキュメントやログを読みながら実装を進める練習をする
 
-そのため、このリポジトリでは以下を優先します。
+本番用の完成度を目指したリポジトリではなく、認証実装の理解と再現力を高めるための practice / sandbox リポジトリです。
 
-- 実装を小さく分けて試す
-- 失敗や試行錯誤も残す
-- エラーを踏みながら Rails / HTTP / 認証の理解を深める
-- 本番に入れる前に認証処理の責務を整理する
+## このリポジトリで扱うこと
 
-## 現在の練習テーマ
-
-現在は主に `Api::Auth::SessionsController#create` を対象に、以下を練習しています。
-
-1. `email` / `password` の受け取り
-2. 入力不正時のレスポンス
-3. `User` の検索
-4. password 照合
-5. raw token の生成
-6. token digest の生成
-7. `AccessToken` への保存
-8. クライアントへの token 返却
-
-## 学習上の主な論点
-
-このリポジトリでは、特に以下の論点を重点的に確認しています。
-
-- `render` と `return` の違い
-- 1 action 内でのレスポンス制御
-- `204 / 200 / 422 / 500` の意味
-- `has_secure_password` と `bcrypt`
-- `password_digest` と `token_digest` の役割の違い
-- `Digest::SHA256.digest` と `hexdigest` の違い
+- ログイン時の認証フロー
+- access token の発行
+- raw token と digest の役割の違い
+- `has_secure_password` によるパスワード認証
 - `User` と `AccessToken` の責務分離
-- `expires_at` と `revoked_at` の意味
+- migration による DB 制約の確認
+- Rails controller における request / response の理解
+- `render` / status / validation error の挙動確認
 
-## 使用技術
+## このリポジトリで重視していること
 
-- Ruby
-- Rails
-- ActiveRecord
-- SQLite / PostgreSQL（必要に応じて切り替え）
-- bcrypt
-- Digest
-- curl（動作確認用）
+このリポジトリでは、単に「動くコードを書く」ことだけではなく、以下を重視しています。
 
-## セットアップ
+- なぜその実装になるのかを言語化できること
+- ログやエラーメッセージから、どこで失敗しているかを切り分けること
+- 公式ドキュメントを読み、必要な箇所を自分で拾うこと
+- AI 補助があっても、最終的には自分の頭で処理の流れを説明できること
 
-```bash
-bundle install
-bin/rails db:create
-bin/rails db:migrate
-bin/rails db:seed
+## 位置づけ
+
+これは本番ポートフォリオそのものではなく、ポートフォリオで扱う認証機能をより深く理解するための補助的な練習リポジトリです。
+
+特に、以下のような力を補強することを目的にしています。
+
+- Web バックエンドの基礎理解
+- Rails の controller / model / migration の責務理解
+- 認証実装の説明責任
+- 自力でのデバッグと試行錯誤
+
+## 現時点の前提
+
+このリポジトリは、試行錯誤や検証途中のコードを含みます。  
+そのため、履歴には学習過程や未完成の実装も含まれます。
+
+完成されたプロダクトというよりは、以下を残すためのリポジトリです。
+
+- どこで詰まったか
+- 何を理解できていないか
+- どう切り分けて前に進んだか
+
+## 今後の練習対象
+
+- `SessionsController#create` の完成
+- `authenticate_user!` の自力実装
+- token revoke / logout 処理
+- request spec による挙動確認
+- 認証失敗時レスポンスの整理
+- digest / hexdigest の使い分けの整理
+
+## メモ
+
+このリポジトリでは、必要に応じて AI を補助的に使うことはあっても、以下を意識しています。
+
+- まず自分で仮説を立てる
+- ログを自分で読む
+- 公式ドキュメントを先に確認する
+- 完成コードをそのまま受け取るのではなく、考える余地を残す
+
+そのため、コミットには練習途中・試行錯誤ベースの内容も含まれます。
