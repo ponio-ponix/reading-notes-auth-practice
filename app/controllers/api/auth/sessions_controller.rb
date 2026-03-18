@@ -1,9 +1,10 @@
 require 'digest'
 
 class Api::Auth::SessionsController < ApplicationController
+
+  #このアクションはログイン後のトークンを生成する関数である
   def create
-    # ここに擬似コード → 実コード寄りで書く
-    #　emailとpasswordの空、かつuserがいるか、passwordは一致してるかの確認
+    # 入力を受ける
     email = params[:email]
     password = params[:password]
 
@@ -11,35 +12,49 @@ class Api::Auth::SessionsController < ApplicationController
       render text: "メールとパスワードが空です" and return 
     end
 
+    # 取得はこれで良いかどうか 
+    # nilだったときどうやって対処するか
     user = User.find_by(email: email)
 
-    if user.email != email || user.password_digest != password
+    if user == nil
+      render text: "このメールアドレスのユーザーはいません" and return 
+    end
+
+    #　本人確認をする
+
+    # パスワードの確認の仕方はイマイチよくわかっていない
+    # userがいなかったときどうするか
+    # 生の値と加工済みの値を混ぜていないか
+    if not user.authenticate(password)
       render text: "メールアドレスかパスワードが違います" and return 
     end
 
+    # tokenを作って保存する
 
-
-    #
-    # 生のraw tokenを生成する
+    # tokenを発行
     raw = SecureRandom.hex(10)
-    #
-    # digestをdb側に保存をする
+
+    # digest
+    # 結局これはどうするのか
     digest = Digest::SHA256.digest(raw)
-    digest = digest.hexdigest
+    digest = Digest.hexencode(digest)
 
 
-
-    # 
-    # 保存をする時、具体的には access tokenを使用する
+    # userはどうするのか？
+    # 誰のトークンかわかる形位なっているか
+    # revoked_atは発行直後にその値で良いかどうか
     AccessToken.create!(
       token_digest: digest,
       expires_at: 1.month.from_now,
-      revoked_at: Time.now
+      revoked_at: nil,
+      user_id: user.id
     )
-    #
-    # クライアントに返す
-    render json: email
 
+    #クライアントに返す
+    #
+    #返却
+    # クライアントに返すのは何か。ログイン後にクライアントが今後使うのは何か。emailではなく何が必要か
+    render json: { token: raw }, status: 200
     #
   end
 end
