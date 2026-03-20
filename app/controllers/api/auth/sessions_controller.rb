@@ -57,4 +57,12 @@ class Api::Auth::SessionsController < ApplicationController
     render json: { token: raw }, status: 200
     #
   end
+
+  def destroy
+    request.headers["Authorization"]
+
+    # access_tokenのrevoked_atを失効することにより、ログイン状態を使えなくする
+  end
+
+
 end
