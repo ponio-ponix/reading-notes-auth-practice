@@ -59,9 +59,23 @@ class Api::Auth::SessionsController < ApplicationController
   end
 
   def destroy
-    request.headers["Authorization"]
-
-    # access_tokenのrevoked_atを失効することにより、ログイン状態を使えなくする
+    # http headerのauthorizationを取り出す。
+    # 
+    # 取り出したauthorizationヘッダをrawとbearerスキームにsplitする
+    # 
+    # bearerスキーム出ないのなら401
+    # 
+    # rawが空の時 401を返す
+    # 
+    # 照合用にrawをdigest化する
+    # 
+    # 有効なaccess_tokenがあるならその中からdigest化したものと照合、なければ401を返す
+    # (コーディングする時、そもそも有効なaccess_tokenがない場合の401も同時に返せるようにする)
+    #
+    # accses_tokenの中のrevoked_atに現在日時を入れて更新をする。これにより失効時間が定義される
+    # 
+    # 
+    # 成功したらjsonでtrueを返す
   end
 
 

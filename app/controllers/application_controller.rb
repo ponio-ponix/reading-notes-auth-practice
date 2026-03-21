@@ -2,23 +2,20 @@
 class ApplicationController < ActionController::API
 
   def authenticate_user!
-    # headerを取得
-    
-    # Bearer tokenを取得
+    # headerから情報を受け取る
     # 
-    # 第一引数がbearerでなければエラー
-    #
-    # rawが空ならエラー
+    # 受け取ったheaderのスキーマとトークンをsplitする
     # 
-    # digest化する
+    # bearerスキームかどうかのチェックをする。ないなら401
     # 
-    # データベースのdigestと照合する
+    # rawが取得できているか。ないなら401
     # 
-    # userを確定する
+    # rawをdigest化する
     # 
-    #　ダメなら401
-    #
-
-    #
+    # activeのaccess_tokenに絞り、digestしたものとdbにあるものを照合する
+    # 
+    # ないなら401エラー
+    # 
+    # digest化したものとdbで照合が取れたらcurrent_userにする
   end
 end
