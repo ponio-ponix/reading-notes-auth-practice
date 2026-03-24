@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   # Rails.application.routes.draw do
   namespace :api do
     namespace :auth do
-      resource :session, only: [:create]
+      resource :session, only: [:create, :destroy]
     end
   end
 end

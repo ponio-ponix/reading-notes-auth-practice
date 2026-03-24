@@ -59,6 +59,7 @@ class Api::Auth::SessionsController < ApplicationController
   end
 
   def destroy
+    authenticate_user!
     # http headerのauthorizationを取り出す。
     # 
     # 取り出したauthorizationヘッダをrawとbearerスキームにsplitする
