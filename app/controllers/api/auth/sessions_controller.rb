@@ -2,6 +2,8 @@ require 'digest'
 
 class Api::Auth::SessionsController < ApplicationController
 
+  before_action :authenticate_user!, only: [:destroy]
+
   #このアクションはログイン後のトークンを生成する関数である
   def create
     # 入力を受ける
@@ -59,16 +61,14 @@ class Api::Auth::SessionsController < ApplicationController
   end
 
   def destroy
-    authenticate_user!
     # http headerのauthorizationを取り出す。
-    # 
-    # 取り出したauthorizationヘッダをrawとbearerスキームにsplitする
-    # 
-    # bearerスキーム出ないのなら401
-    # 
-    # rawが空の時 401を返す
-    # 
-    # 照合用にrawをdigest化する
+    if @active_token != nil
+
+      @active_token.update(revoked_at: Time.now)
+      render json: { token: true }, status: :ok and return
+    end
+      render json: { token: "not token" }, status: :unauthorized and return
+
     # 
     # 有効なaccess_tokenがあるならその中からdigest化したものと照合、なければ401を返す
     # (コーディングする時、そもそも有効なaccess_tokenがない場合の401も同時に返せるようにする)
