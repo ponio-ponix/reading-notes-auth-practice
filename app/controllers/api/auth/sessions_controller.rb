@@ -6,45 +6,51 @@ class Api::Auth::SessionsController < ApplicationController
 
   #このアクションはログイン後のトークンを生成する関数である
   def create
-    # 入力を受ける
+    # ①入力を受ける
+    # 入力
     email = params[:email]
     password = params[:password]
 
-    if email.empty? || password.empty?
-      render text: "メールとパスワードが空です" and return 
+    # ②メールかパスワードが空かのチェック
+    # 分岐1
+    if email.blank? || password.blank?
+      render json: { error: "メールアドレスととパスワードを入力してください" }, status: :bad_request and return 
     end
-
-    # 取得はこれで良いかどうか 
-    # nilだったときどうやって対処するか
+    
+    # ③emailのuserを取得する
     user = User.find_by(email: email)
 
+    
+    # 分岐2
     if user == nil
-      render text: "このメールアドレスのユーザーはいません" and return 
+      render json: { error: "このメールアドレスのユーザーはいません" }, status: :unauthorized and return
     end
 
-    #　本人確認をする
-
-    # パスワードの確認の仕方はイマイチよくわかっていない
-    # userがいなかったときどうするか
-    # 生の値と加工済みの値を混ぜていないか
+    # ④パスワードが一致してるか
+    # 分岐3
     if not user.authenticate(password)
-      render text: "メールアドレスかパスワードが違います" and return 
+      render json: { error: "メールアドレスかパスワードが違います" }, status: :unauthorized and return 
     end
 
     # tokenを作って保存する
 
     # tokenを発行
+    # ⑤ rawのオブジェクトを作る
+    # 保存1
     raw = SecureRandom.hex(10)
 
     # digest
     # 結局これはどうするのか
-    digest = Digest::SHA256.digest(raw)
-    digest = Digest.hexencode(digest)
+    # ⑥rawをdigest化する、その時人間が読めるような文字にする
+    # 保存2
+    digest = Digest::SHA256.hexdigest(raw)
 
 
     # userはどうするのか？
     # 誰のトークンかわかる形位なっているか
     # revoked_atは発行直後にその値で良いかどうか
+    # ⑦digestでaccess_tokenオブジェクトを作る
+    # 保存3
     AccessToken.create!(
       token_digest: digest,
       expires_at: 1.month.from_now,
@@ -54,8 +60,9 @@ class Api::Auth::SessionsController < ApplicationController
 
     #クライアントに返す
     #
-    #返却
+    # 返却
     # クライアントに返すのは何か。ログイン後にクライアントが今後使うのは何か。emailではなく何が必要か
+    # ⑧renderでクライアント側にrawを返す
     render json: { token: raw }, status: 200
     #
   end
