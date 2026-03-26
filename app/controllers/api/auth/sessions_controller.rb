@@ -1,10 +1,9 @@
-require 'digest'
+require "digest"
 
 class Api::Auth::SessionsController < ApplicationController
+  before_action :authenticate_user!, only: [ :destroy ]
 
-  before_action :authenticate_user!, only: [:destroy]
-
-  #このアクションはログイン後のトークンを生成する関数である
+  # このアクションはログイン後のトークンを生成する関数である
   def create
     # ①入力を受ける
     # 入力
@@ -14,13 +13,13 @@ class Api::Auth::SessionsController < ApplicationController
     # ②メールかパスワードが空かのチェック
     # 分岐1
     if email.blank? || password.blank?
-      render json: { error: "メールアドレスととパスワードを入力してください" }, status: :bad_request and return 
+      render json: { error: "メールアドレスとパスワードを入力してください" }, status: :bad_request and return
     end
-    
+
     # ③emailのuserを取得する
     user = User.find_by(email: email)
 
-    
+
     # 分岐2
     if user == nil
       render json: { error: "このメールアドレスのユーザーはいません" }, status: :unauthorized and return
@@ -29,7 +28,7 @@ class Api::Auth::SessionsController < ApplicationController
     # ④パスワードが一致してるか
     # 分岐3
     if not user.authenticate(password)
-      render json: { error: "メールアドレスかパスワードが違います" }, status: :unauthorized and return 
+      render json: { error: "メールアドレスかパスワードが違います" }, status: :unauthorized and return
     end
 
     # tokenを作って保存する
@@ -58,7 +57,7 @@ class Api::Auth::SessionsController < ApplicationController
       user_id: user.id
     )
 
-    #クライアントに返す
+    # クライアントに返す
     #
     # 返却
     # クライアントに返すのは何か。ログイン後にクライアントが今後使うのは何か。emailではなく何が必要か
@@ -76,15 +75,13 @@ class Api::Auth::SessionsController < ApplicationController
     end
       render json: { token: "not token" }, status: :unauthorized and return
 
-    # 
+    #
     # 有効なaccess_tokenがあるならその中からdigest化したものと照合、なければ401を返す
     # (コーディングする時、そもそも有効なaccess_tokenがない場合の401も同時に返せるようにする)
     #
     # accses_tokenの中のrevoked_atに現在日時を入れて更新をする。これにより失効時間が定義される
-    # 
-    # 
+    #
+    #
     # 成功したらjsonでtrueを返す
   end
-
-
 end

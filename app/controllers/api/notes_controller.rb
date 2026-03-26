@@ -1,21 +1,19 @@
 class Api::NotesController < ApplicationController
-  before_action :set_book, only: [:create]
+  before_action :set_book, only: [ :create ]
 
   def create
-    #bookに紐づくnoteオブジェクトを生成する
-    #生成する時にnote_paramsを使う
-    
+    # bookに紐づくnoteオブジェクトを生成する
+    # 生成する時にnote_paramsを使う
   end
 
   def destroy
-    
   end
 
   def set_book
-    #current_userに紐づく論理削除されていないかつ特定のbook_idのbookを@bookに入れる
+    # current_userに紐づく論理削除されていないかつ特定のbook_idのbookを@bookに入れる
   end
 
   def note_params
-    #noteモデルのpage、quote,memoの情報を取得する
+    # noteモデルのpage、quote,memoの情報を取得する
   end
 end
