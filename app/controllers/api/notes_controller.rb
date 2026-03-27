@@ -7,6 +7,9 @@ class Api::NotesController < ApplicationController
   end
 
   def destroy
+    # note.find(params[:id]はidが合えばnoteを直接取得できる)
+    # current_userのnoteが確認していないため、owner-scopeが弱い
+    # そのため、他人のnoteに触れる余地がある
   end
 
   def set_book
